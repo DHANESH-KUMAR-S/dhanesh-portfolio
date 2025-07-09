@@ -14,22 +14,27 @@ import {
   Stack,
   LinearProgress,
   Paper,
-  Grid,
   useMediaQuery
 } from '@mui/material';
-import { Brightness4, Brightness7, Menu as MenuIcon } from '@mui/icons-material';
+import { Brightness4, Brightness7 } from '@mui/icons-material';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/scrollbar';
-import SwiperCore from 'swiper';
 import Particles from './Particles';
 import './Particles.css';
-import Lanyard from './Lanyard';
+import profile from './profile.png';
+import ClickSpark from './ClickSpark';
+import ProfileCard from './ProfileCard';
+import bgavatar from './bgavatar.png';
+import grain from './grain.webp';
+import { Typewriter } from 'react-simple-typewriter';
+import CertificationsSection from './CertificationsSection';
 
 const NAV_ITEMS = [
   { label: 'Hero', id: 'hero' },
   { label: 'Skills', id: 'skills' },
   { label: 'Projects', id: 'projects' },
+  { label: 'Certifications', id: 'certifications' },
 ];
 
 const SKILLS = [
@@ -108,17 +113,59 @@ function MyAppBar({ darkMode, toggleDarkMode }) {
 
 function HeroSection() {
   return (
-    <Box id="hero" sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default', pt: 10 }}>
+    <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'background.default', pt: 10 }}>
       <Container maxWidth="md">
-        <Paper elevation={4} sx={{ p: 6, borderRadius: 4, textAlign: 'center', bgcolor: 'background.paper', backdropFilter: 'blur(8px)' }}>
+        <Paper elevation={4} sx={{
+          p: 6,
+          borderRadius: 4,
+          textAlign: 'center',
+          bgcolor: 'background.paper',
+          backdropFilter: 'blur(8px)',
+          borderTop: '4px solid #00e6fb',
+          borderBottom: '4px solid #00e6fb',
+          borderLeft: '4px solid #00e6fb',
+          borderRight: '4px solid #00e6fb',
+        }}>
           <Typography variant="h2" color="primary" fontWeight={800} gutterBottom>
-            Dhanesh Kumar S
+            Dhanesh Kumar
           </Typography>
-          <Typography variant="h5" color="text.secondary" gutterBottom>
-            Aspiring Software Developer
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Welcome to my portfolio! Scroll down to see my skills and projects.
+          <Typography
+            variant="h4"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              fontWeight: 700,
+              mb: 2,
+              minHeight: '2.5em',
+              flexWrap: 'nowrap',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              fontSize: { xs: '1.1rem', sm: '1.5rem', md: '2rem' },
+              width: '100%',
+              maxWidth: '100%',
+            }}
+          >
+            <span style={{ color: '#fff', fontWeight: 600, marginRight: 8, whiteSpace: 'nowrap' }}>
+              Hi there !, I&apos;m a
+            </span>
+            <span style={{ color: '#00e6fb', textShadow: '0 0 12px #00e6fb, 0 0 24px #1976d2', fontFamily: 'monospace', fontWeight: 800, whiteSpace: 'nowrap' }}>
+              <Typewriter
+                words={[
+                  'Aspiring Developer',
+                  'Cloud Enthusiast',
+                  'Motivated Individual',
+                ]}
+                loop={0}
+                cursor
+                cursorStyle="_"
+                typeSpeed={70}
+                deleteSpeed={50}
+                delaySpeed={1200}
+              />
+            </span>
           </Typography>
         </Paper>
       </Container>
@@ -210,16 +257,35 @@ export default function App() {
   }), [darkMode]);
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Lanyard />
-      <Particles particleCount={200} particleSpread={10} />
-      <MyAppBar darkMode={darkMode} toggleDarkMode={() => setDarkMode(m => !m)} />
-      <Box sx={{ pt: 8 }}>
-        <HeroSection />
+    <ClickSpark sparkColor="#1976d2" sparkSize={16} sparkRadius={32} sparkCount={12} duration={600}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <MyAppBar darkMode={darkMode} toggleDarkMode={() => setDarkMode(!darkMode)} />
+        <Particles />
+        {/* Overlapping ProfileCard and HeroSection, centered and visually connected */}
+        <div id="hero" style={{ position: 'relative', width: 800, maxWidth: '95vw', margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2, paddingTop: 0, overflow: 'visible' }}>
+          <div style={{ position: 'absolute', left: 0, right: 0, top: '80px', display: 'flex', justifyContent: 'center', zIndex: 3 }}>
+            <ProfileCard
+              avatarUrl={profile}
+              miniAvatarUrl={profile}
+              iconUrl={bgavatar}
+              grainUrl={grain}
+              name="DHANESH KUMAR S"
+              title="Aspiring Software Engineer"
+              handle="dhaneshkumars"
+              status="Online"
+              contactText="Contact"
+              showBehindGradient={false}
+            />
+          </div>
+          <div style={{ width: 800, maxWidth: '95vw', margin: '0 auto', marginTop: 270 }}>
+            <HeroSection />
+          </div>
+    </div>
         <SkillsSection />
         <ProjectsSection />
-      </Box>
-    </ThemeProvider>
+        <CertificationsSection />
+      </ThemeProvider>
+    </ClickSpark>
   );
 }
