@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Box, Typography, Chip, Paper } from '@mui/material';
+import { Box, Typography, Paper } from '@mui/material';
+import TechLogos from './TechLogos';
 
 const ProjectCard3D = ({ project, onClick }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -34,7 +35,7 @@ const ProjectCard3D = ({ project, onClick }) => {
             ? `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${project.screenshot})`
             : 'linear-gradient(135deg, rgba(25, 118, 210, 0.1) 0%, rgba(0, 230, 251, 0.1) 100%)',
           backgroundSize: 'contain',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center 50px',
           backgroundRepeat: 'no-repeat',
           border: '2px solid rgba(25, 118, 210, 0.2)',
           backdropFilter: 'blur(10px)',
@@ -116,48 +117,13 @@ const ProjectCard3D = ({ project, onClick }) => {
             flexDirection: 'column',
             justifyContent: 'flex-end',
             p: 3,
+            pb: 2,
             position: 'relative',
             zIndex: 1,
           }}
         >
           {/* Tech Stack - Bottom */}
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 1,
-              justifyContent: 'center',
-              background: 'rgba(0, 0, 0, 0.7)',
-              borderRadius: 2,
-              padding: 2,
-              backdropFilter: 'blur(10px)',
-            }}
-          >
-            {project.tech.map((tech, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <Chip
-                  label={tech}
-                  size="small"
-                  sx={{
-                    backgroundColor: 'rgba(25, 118, 210, 0.9)',
-                    color: 'white',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    fontWeight: 600,
-                    '&:hover': {
-                      backgroundColor: 'rgba(25, 118, 210, 1)',
-                      transform: 'scale(1.05)',
-                    },
-                    transition: 'all 0.2s ease',
-                  }}
-                />
-              </motion.div>
-            ))}
-          </Box>
+          <TechLogos techStack={project.tech} />
         </Box>
 
         {/* Corner accent */}

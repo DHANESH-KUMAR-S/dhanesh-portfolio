@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
-import { Box, IconButton, Typography, Paper, Chip } from '@mui/material';
+import { Box, IconButton, Typography, Paper, Tooltip } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { motion } from 'framer-motion';
 import BlurText from './BlurText';
+import TechLogos from './TechLogos';
 
 const ProjectModal = ({ project, isOpen, onClose }) => {
   useEffect(() => {
@@ -57,11 +59,10 @@ const ProjectModal = ({ project, isOpen, onClose }) => {
           onClick={(e) => e.stopPropagation()}
           sx={{
             position: 'relative',
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            width: 600,
+            maxWidth: '98vw',
+            maxHeight: '98vh',
+            width: 800,
             borderRadius: 3,
-            overflow: 'hidden',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
             background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(0, 230, 251, 0.05) 100%)',
             border: '2px solid rgba(25, 118, 210, 0.2)',
@@ -104,9 +105,10 @@ const ProjectModal = ({ project, isOpen, onClose }) => {
               </Typography>
               <BlurText
                 text={`Project Name: ${project.name}`}
-                delay={100}
+                delay={40}
                 className="text-xl font-bold mb-4"
                 color="#1976d2"
+                stepDuration={0.15}
               />
             </Box>
 
@@ -114,65 +116,46 @@ const ProjectModal = ({ project, isOpen, onClose }) => {
             <Box sx={{ mb: 4 }}>
               <BlurText
                 text="Description:"
-                delay={200}
+                delay={60}
                 className="text-lg font-semibold mb-2"
                 color="#1976d2"
+                stepDuration={0.15}
               />
               <BlurText
                 text={project.description}
-                delay={300}
+                delay={80}
                 className="text-base leading-relaxed"
                 color="#1976d2"
                 animateBy="words"
-                stepDuration={0.5}
+                stepDuration={0.15}
               />
             </Box>
 
             {/* Tech Stack */}
-            <Box sx={{ mb: 4 }}>
-              <BlurText
-                text="Tech Stack:"
-                delay={400}
-                className="text-lg font-semibold mb-3"
-                color="#1976d2"
-              />
-              <Box
+            <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography
                 sx={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
+                  fontWeight: 600,
+                  color: '#1976d2',
+                  fontSize: '1.1rem',
+                  minWidth: '110px',
                 }}
               >
+                Tech Stack:
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', justifyContent: 'flex-start' }}>
                 {project.tech.map((tech, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 500 + index * 100 }}
-                  >
-                    <Chip
-                      label={tech}
-                      size="medium"
-                      sx={{
-                        backgroundColor: 'rgba(25, 118, 210, 0.1)',
-                        color: '#1976d2',
-                        border: '2px solid rgba(25, 118, 210, 0.3)',
-                        fontWeight: 600,
-                        fontSize: '0.9rem',
-                        '&:hover': {
-                          backgroundColor: 'rgba(25, 118, 210, 0.2)',
-                          transform: 'scale(1.05)',
-                        },
-                        transition: 'all 0.2s ease',
-                      }}
-                    />
-                  </motion.div>
+                  <Tooltip title={tech} key={index} arrow disablePortal={false}>
+                    <span>
+                      <TechLogos techStack={[tech]} />
+                    </span>
+                  </Tooltip>
                 ))}
               </Box>
             </Box>
 
             {/* View Project Button */}
-            <Box sx={{ textAlign: 'center', mt: 4 }}>
+            <Box sx={{ textAlign: 'center', mt: 4, display: 'flex', justifyContent: 'center', gap: 2 }}>
               <motion.a
                 href={project.link}
                 target="_blank"
@@ -180,7 +163,8 @@ const ProjectModal = ({ project, isOpen, onClose }) => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
-                  display: 'inline-block',
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   padding: '12px 24px',
                   backgroundColor: '#1976d2',
                   color: 'white',
@@ -193,6 +177,29 @@ const ProjectModal = ({ project, isOpen, onClose }) => {
                 }}
               >
                 View Project
+              </motion.a>
+              <motion.a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '12px 24px',
+                  backgroundColor: '#FFD600',
+                  color: '#222',
+                  textDecoration: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  transition: 'all 0.2s ease',
+                  boxShadow: '0 4px 12px rgba(255, 214, 0, 0.2)',
+                  marginLeft: 8,
+                }}
+              >
+                <GitHubIcon sx={{ mr: 1, fontSize: 24 }} /> Github link
               </motion.a>
             </Box>
           </Box>

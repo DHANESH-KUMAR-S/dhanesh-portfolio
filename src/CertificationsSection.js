@@ -42,21 +42,21 @@ export default function CertificationsSection() {
   return (
     <>
       <section id="certifications" style={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', scrollMarginTop: '80px' }}>
-        <h2 style={{ marginBottom: 32, fontWeight: 700, fontSize: 32 }}>Certifications</h2>
-        <div style={{
-          width: '100%',
-          maxWidth: 1600,
-          height: 600,
-          background: 'rgba(30,30,40,0.85)',
-          border: '3px solid var(--mui-palette-divider, rgba(160,160,160,0.25))',
-          borderRadius: 18,
-          boxShadow: '0 6px 32px 0 rgba(0,0,0,0.18)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
-          backdropFilter: 'blur(6px)',
-        }}>
+      <h2 style={{ marginBottom: 32, fontWeight: 700, fontSize: 32 }}>Certifications</h2>
+      <div style={{
+        width: '100%',
+        maxWidth: 1600,
+        height: 600,
+        background: 'rgba(30,30,40,0.85)',
+        border: '3px solid var(--mui-palette-divider, rgba(160,160,160,0.25))',
+        borderRadius: 18,
+        boxShadow: '0 6px 32px 0 rgba(0,0,0,0.18)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        backdropFilter: 'blur(6px)',
+      }}>
           <CircularGallery 
             items={certificates} 
             bend={2.5} 
@@ -64,7 +64,7 @@ export default function CertificationsSection() {
             cardHeight={860}
             onCertificateClick={handleCertificateClick}
           />
-        </div>
+      </div>
         <Typography 
           variant="body2" 
           sx={{ 
@@ -76,7 +76,7 @@ export default function CertificationsSection() {
         >
           Click on any certificate to view it in full detail
         </Typography>
-      </section>
+    </section>
 
       <CertificateModal
         certificate={selectedCertificate}
