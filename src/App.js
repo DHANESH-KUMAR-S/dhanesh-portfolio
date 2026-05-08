@@ -12,8 +12,8 @@ import {
   ThemeProvider,
   createTheme,
   Stack,
-  LinearProgress,
-  Paper
+  Paper,
+  Tooltip
 } from '@mui/material';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -42,17 +42,56 @@ const NAV_ITEMS = [
   { label: 'Certifications', id: 'certifications' },
 ];
 
-const SKILLS = [
-  'Python',
-  'JavaScript',
-  'React',
-  'Node.js',
-  'HTML/CSS',
-  'Flask',
-  'Java',
-  'C++',
-  'C',
-  'GitHub',
+const TECHNICAL_SKILL_GROUPS = [
+  {
+    title: 'Programming Languages',
+    accent: '#00e6fb',
+    skills: [
+      { label: 'C', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg' },
+      { label: 'C++', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg' },
+      { label: 'Java', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg' },
+      { label: 'JavaScript', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg' },
+      { label: 'Python', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg' },
+      { label: 'SQL', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+    ],
+  },
+  {
+    title: 'Frameworks/Libraries',
+    accent: '#4fc3f7',
+    skills: [
+      { label: 'React', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg' },
+      { label: 'FastAPI', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg' },
+      { label: 'Flask', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg' },
+      { label: 'Node.js', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg' },
+    ],
+  },
+  {
+    title: 'Cloud/DevOps',
+    accent: '#64b5f6',
+    skills: [
+      { label: 'GCP (Cloud Run, Cloud Storage)', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg' },
+      { label: 'Docker', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg' },
+    ],
+  },
+  {
+    title: 'Databases',
+    accent: '#81d4fa',
+    skills: [
+      { label: 'MySQL', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' },
+      { label: 'MongoDB', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg' },
+      { label: 'Firebase', iconUrl: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg' },
+    ],
+  },
+  {
+    title: 'CS Concepts',
+    accent: '#90caf9',
+    skills: [
+      { label: 'DBMS Fundamentals' },
+      { label: 'Computer Networks' },
+      { label: 'OOPs' },
+      { label: 'RAG Architecture' },
+    ],
+  },
 ];
 
 const PROJECTS = [
@@ -231,8 +270,8 @@ function HeroSection() {
                 onClick={() => {
                   // Add your resume download link here
                   const link = document.createElement('a');
-                  link.href = '/resume.pdf'; // Update this path to your actual resume file
-                  link.download = 'Dhanesh_Kumar_Resume.pdf';
+                  link.href = 'www.tinyurl.com/sdkresumee'; // Update this path to your actual resume file
+                  link.open = true;
                   link.click();
                 }}
               >
@@ -297,13 +336,24 @@ function SkillsSection() {
             </Typography>
             <Box
               sx={{
-                border: '2px solid',
-                borderColor: 'primary.main',
-                borderRadius: 3,
+                border: '1px solid rgba(111, 206, 255, 0.45)',
+                borderRadius: '24px',
                 p: 4,
-                background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(0, 230, 251, 0.05) 100%)',
+                background: 'linear-gradient(135deg, rgba(9, 20, 38, 0.8) 0%, rgba(10, 37, 58, 0.55) 45%, rgba(0, 230, 251, 0.08) 100%)',
                 position: 'relative',
                 overflow: 'hidden',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  width: 260,
+                  height: 260,
+                  top: -110,
+                  right: -80,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(0, 230, 251, 0.3) 0%, rgba(0, 230, 251, 0) 72%)',
+                  pointerEvents: 'none',
+                },
                 '&::before': {
                   content: '""',
                   position: 'absolute',
@@ -316,32 +366,115 @@ function SkillsSection() {
                 }
               }}
             >
-              <Stack spacing={4}>
-                {SKILLS.map(skill => {
-                  const value = Math.floor(Math.random() * 41) + 60; // 60-100%
-                  return (
-                    <Box key={skill}>
-                      <Stack direction="row" justifyContent="space-between">
-                        <Typography fontWeight={600}>{skill}</Typography>
-                        <Typography color="text.secondary">{value}%</Typography>
-                      </Stack>
-                      <LinearProgress 
-                        variant="determinate" 
-                        value={value} 
-                        sx={{ 
-                          height: 10, 
-                          borderRadius: 5, 
-                          mt: 1, 
-                          bgcolor: 'grey.300',
-                          '& .MuiLinearProgress-bar': {
-                            background: 'linear-gradient(90deg, #1976d2, #00e6fb)',
-                          }
-                        }} 
-                      />
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                  gap: 2.5,
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                {TECHNICAL_SKILL_GROUPS.map((group, groupIndex) => (
+                  <motion.div
+                    key={group.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: groupIndex * 0.1, duration: 0.45 }}
+                  >
+                    <Box
+                      sx={{
+                        border: `1px solid ${group.accent}70`,
+                        borderRadius: '20px',
+                        p: 2,
+                        height: '100%',
+                        background: `linear-gradient(145deg, rgba(255,255,255,0.07) 0%, ${group.accent}20 100%)`,
+                        backdropFilter: 'blur(12px)',
+                        transition: 'all 0.28s ease',
+                        '&:hover': {
+                          transform: 'translateY(-4px) scale(1.01)',
+                          boxShadow: `0 14px 32px ${group.accent}44`,
+                        },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontWeight: 700,
+                          fontSize: '0.95rem',
+                          mb: 1.5,
+                          color: group.accent,
+                          letterSpacing: 0.2,
+                        }}
+                      >
+                        {group.title}
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.1 }}>
+                        {group.skills.map((skill) => (
+                          <Tooltip key={skill.label} title={skill.label} arrow>
+                            <Box
+                              sx={{
+                                px: 1.4,
+                                py: 0.8,
+                                borderRadius: '14px',
+                                border: `1px solid ${group.accent}88`,
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 100%)',
+                                color: 'text.primary',
+                                fontSize: '0.82rem',
+                                fontWeight: 600,
+                                lineHeight: 1.2,
+                                letterSpacing: 0.2,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.8,
+                                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+                                transition: 'all 0.22s ease',
+                                cursor: 'default',
+                                '&:hover': {
+                                  background: `${group.accent}2b`,
+                                  borderColor: group.accent,
+                                  transform: 'translateY(-1px)',
+                                },
+                              }}
+                            >
+                              {skill.iconUrl ? (
+                                <Box
+                                  component="span"
+                                  aria-label={skill.label}
+                                  sx={{
+                                    minWidth: 28,
+                                    height: 28,
+                                    borderRadius: '9px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    background: 'rgba(14, 22, 32, 0.88)',
+                                    border: `1px solid ${group.accent}66`,
+                                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08)',
+                                    p: 0.5,
+                                  }}
+                                >
+                                  <Box
+                                    component="img"
+                                    src={skill.iconUrl}
+                                    alt={skill.label}
+                                    sx={{
+                                      width: 18,
+                                      height: 18,
+                                      display: 'block',
+                                    }}
+                                  />
+                                </Box>
+                              ) : (
+                                <span>{skill.label}</span>
+                              )}
+                            </Box>
+                          </Tooltip>
+                        ))}
+                      </Box>
                     </Box>
-                  );
-                })}
-              </Stack>
+                  </motion.div>
+                ))}
+              </Box>
             </Box>
           </Box>
 
@@ -350,106 +483,104 @@ function SkillsSection() {
             <Typography variant="h5" color="primary" fontWeight={600} align="center" gutterBottom sx={{ mb: 4 }}>
               Soft Skills
             </Typography>
-            {/* Individual Cylindrical Capsules for Soft Skills */}
             <Box
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 3,
-                alignItems: 'center',
+                border: '1px solid rgba(111, 206, 255, 0.45)',
+                borderRadius: '24px',
+                p: 4,
+                background: 'linear-gradient(135deg, rgba(9, 20, 38, 0.8) 0%, rgba(10, 37, 58, 0.55) 45%, rgba(0, 230, 251, 0.08) 100%)',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 20px 50px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
+                '&::after': {
+                  content: '""',
+                  position: 'absolute',
+                  width: 240,
+                  height: 240,
+                  top: -95,
+                  right: -70,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(0, 230, 251, 0.25) 0%, rgba(0, 230, 251, 0) 72%)',
+                  pointerEvents: 'none',
+                },
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent, rgba(0, 230, 251, 0.1), transparent)',
+                  animation: `${shimmerKeyframes} 3.2s infinite`,
+                },
               }}
             >
-              {SOFT_SKILLS.map((skill, index) => (
-                <motion.div
-                  key={skill.name}
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.2, duration: 0.6 }}
-                  style={{ width: '100%' }}
-                >
-                  <Box
-                    sx={{
-                      position: 'relative',
-                      border: '2px solid',
-                      borderColor: 'primary.main',
-                      borderRadius: '50px',
-                      p: 3,
-                      textAlign: 'center',
-                      background: 'linear-gradient(135deg, rgba(25, 118, 210, 0.05) 0%, rgba(0, 230, 251, 0.05) 100%)',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 2,
-                      minHeight: '80px',
-                      '&:hover': {
-                        transform: 'translateY(-3px)',
-                        boxShadow: '0 8px 25px rgba(0, 230, 251, 0.3)',
-                        borderColor: '#00e6fb',
-                        '& .skill-description': {
-                          opacity: 1,
-                          visibility: 'visible',
-                          transform: 'translateY(0)',
-                        }
-                      },
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: '-100%',
-                        width: '100%',
-                        height: '100%',
-                        background: 'linear-gradient(90deg, transparent, rgba(0, 230, 251, 0.1), transparent)',
-                        animation: `${shimmerKeyframes} 3s infinite`,
-                        animationDelay: `${index * 0.5}s`,
-                      }
-                    }}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                  gap: 2.5,
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                {SOFT_SKILLS.map((skill, index) => (
+                  <motion.div
+                    key={skill.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1, duration: 0.45 }}
                   >
-                    <Typography variant="h3" sx={{ fontSize: '2.5rem' }}>
-                      {skill.icon}
-                    </Typography>
-                    <Typography variant="h6" fontWeight={600} sx={{ flex: 1 }}>
-                      {skill.name}
-                    </Typography>
-                    
-                    {/* Hover Card */}
                     <Box
-                      className="skill-description"
                       sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '100%',
-                        transform: 'translateY(-50%) translateX(10px)',
-                        width: '300px',
-                        background: 'rgba(0, 0, 0, 0.9)',
-                        color: 'white',
-                        borderRadius: 2,
-                        p: 2,
-                        opacity: 0,
-                        visibility: 'hidden',
-                        transition: 'all 0.3s ease',
-                        zIndex: 1000,
-                        backdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(0, 230, 251, 0.3)',
-                        '&::after': {
-                          content: '""',
-                          position: 'absolute',
-                          top: '50%',
-                          right: '100%',
-                          transform: 'translateY(-50%)',
-                          border: '8px solid transparent',
-                          borderRightColor: 'rgba(0, 0, 0, 0.9)',
-                        }
+                        border: '1px solid rgba(0, 230, 251, 0.45)',
+                        borderRadius: '20px',
+                        p: 2.2,
+                        height: '100%',
+                        background: 'linear-gradient(145deg, rgba(255,255,255,0.08) 0%, rgba(0, 230, 251, 0.12) 100%)',
+                        backdropFilter: 'blur(12px)',
+                        transition: 'all 0.28s ease',
+                        '&:hover': {
+                          transform: 'translateY(-4px) scale(1.01)',
+                          boxShadow: '0 14px 32px rgba(0, 230, 251, 0.24)',
+                          borderColor: 'rgba(0, 230, 251, 0.78)',
+                        },
                       }}
                     >
-                      <Typography variant="body2" sx={{ lineHeight: 1.5 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, mb: 1.2 }}>
+                        <Box
+                          sx={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: '10px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '1.2rem',
+                            background: 'rgba(14, 22, 32, 0.88)',
+                            border: '1px solid rgba(0, 230, 251, 0.5)',
+                          }}
+                        >
+                          {skill.icon}
+                        </Box>
+                        <Typography variant="h6" fontWeight={700} sx={{ fontSize: '1rem', lineHeight: 1.25 }}>
+                          {skill.name}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                          lineHeight: 1.6,
+                          fontSize: '0.9rem',
+                        }}
+                      >
                         {skill.description}
                       </Typography>
                     </Box>
-                  </Box>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
+              </Box>
             </Box>
           </Box>
         </Box>
