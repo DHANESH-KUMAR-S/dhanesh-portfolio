@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Typography } from '@mui/material';
 import CircularGallery from './CircularGallery';
+import CertificateModal from './CertificateModal';
 
 import Mern_Intro from './certifications/Mern_Intro.png';
 import Azura_CV from './certifications/azura_CV.png';
@@ -12,20 +14,34 @@ import Problem_Solving from './certifications/Problem_Solving.png';
 import Java_Basic from './certifications/Java_basic.png';
 
 const certificates = [
-  { image: Mern_Intro, text: 'MERN Stack Introduction' },
-  { image: Azura_CV, text: 'Azura CV' },
-  { image: Java_Fundamental, text: 'Java Fundamental' },
-  { image: Python_Foundations, text: 'Python Foundations' },
-  { image: Basics_of_Python, text: 'Basics of Python' },
-  { image: Python_Basic, text: 'Python Basic' },
-  { image: Software_Engineer, text: 'Software Engineer' },
-  { image: Problem_Solving, text: 'Problem Solving' },
-  { image: Java_Basic, text: 'Java Basic' },
+  { image: Mern_Intro, text: 'MERN Stack Intro (Simplilearn)' },
+  { image: Azura_CV, text: 'CV app with Azure (Coursera)' },
+  { image: Java_Fundamental, text: 'Java Fundamentals(Infosys Springboard)' },
+  { image: Python_Foundations, text: 'Python Foundations(Infosys Springboard)' },
+  { image: Basics_of_Python, text: 'Basics of Python(Infosys Springboard)' },
+  { image: Python_Basic, text: 'Python Basic(Hackerrank)' },
+  { image: Software_Engineer, text: 'Software Engineer(Hackerrank)' },
+  { image: Problem_Solving, text: 'Problem Solving(Hackerrank)' },
+  { image: Java_Basic, text: 'Java Basic(Hackerrank)' },
 ];
 
 export default function CertificationsSection() {
+  const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleCertificateClick = (certificate) => {
+    setSelectedCertificate(certificate);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCertificate(null);
+  };
+
   return (
-    <section id="certifications" style={{ width: '100%', minHeight: 700, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
+    <>
+      <section id="certifications" style={{ width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 0', scrollMarginTop: '80px' }}>
       <h2 style={{ marginBottom: 32, fontWeight: 700, fontSize: 32 }}>Certifications</h2>
       <div style={{
         width: '100%',
@@ -41,8 +57,32 @@ export default function CertificationsSection() {
         padding: 24,
         backdropFilter: 'blur(6px)',
       }}>
-        <CircularGallery items={certificates} bend={2.5} cardWidth={1200} cardHeight={860} />
+          <CircularGallery 
+            items={certificates} 
+            bend={2.5} 
+            cardWidth={1200} 
+            cardHeight={860}
+            onCertificateClick={handleCertificateClick}
+          />
       </div>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            mt: 2, 
+            textAlign: 'center', 
+            color: 'text.secondary',
+            fontStyle: 'italic'
+          }}
+        >
+          Click on any certificate to view it in full detail
+        </Typography>
     </section>
+
+      <CertificateModal
+        certificate={selectedCertificate}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
+    </>
   );
 } 

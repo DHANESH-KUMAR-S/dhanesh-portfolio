@@ -52,10 +52,76 @@ class Title {
     this.text = text;
     this.textColor = textColor;
     this.font = font;
+    this.parseText();
     this.createMesh();
   }
+  
+  parseText() {
+    // Parse certificate text to extract organization and name
+    const match = this.text.match(/^(.+?)\s*\(([^)]+)\)$/);
+    if (match) {
+      this.certificateName = match[1].trim();
+      this.organization = match[2].trim();
+    } else {
+      this.certificateName = this.text;
+      this.organization = '';
+    }
+  }
+  
   createMesh() {
-    const { texture, width, height } = createTextTexture(this.gl, this.text, this.font, this.textColor);
+    // Create texture for organization name (above image)
+    if (this.organization) {
+      const { texture: orgTexture, width: orgWidth, height: orgHeight } = createTextTexture(
+        this.gl, 
+        this.organization, 
+        "bold 20px Figtree", 
+        "#ffffff"
+      );
+      
+      const orgGeometry = new Plane(this.gl);
+      const orgProgram = new Program(this.gl, {
+        vertex: `
+          attribute vec3 position;
+          attribute vec2 uv;
+          uniform mat4 modelViewMatrix;
+          uniform mat4 projectionMatrix;
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragment: `
+          precision highp float;
+          uniform sampler2D tMap;
+          varying vec2 vUv;
+          void main() {
+            vec4 color = texture2D(tMap, vUv);
+            if (color.a < 0.1) discard;
+            gl_FragColor = color;
+          }
+        `,
+        uniforms: { tMap: { value: orgTexture } },
+        transparent: true,
+      });
+      
+      this.orgMesh = new Mesh(this.gl, { geometry: orgGeometry, program: orgProgram });
+      const orgAspect = orgWidth / orgHeight;
+      const orgDisplayHeight = this.plane.scale.y * 0.12;
+      const orgDisplayWidth = orgDisplayHeight * orgAspect;
+      this.orgMesh.scale.set(orgDisplayWidth, orgDisplayHeight, 1);
+      this.orgMesh.position.y = this.plane.scale.y * 0.5 + orgDisplayHeight * 0.5 + 0.05;
+      this.orgMesh.setParent(this.plane);
+    }
+    
+    // Create texture for certificate name (below image)
+    const { texture, width, height } = createTextTexture(
+      this.gl, 
+      this.certificateName, 
+      this.font, 
+      this.textColor
+    );
+    
     const geometry = new Plane(this.gl);
     const program = new Program(this.gl, {
       vertex: `
@@ -82,6 +148,7 @@ class Title {
       uniforms: { tMap: { value: texture } },
       transparent: true,
     });
+    
     this.mesh = new Mesh(this.gl, { geometry, program });
     const aspect = width / height;
     const textHeight = this.plane.scale.y * 0.15;
@@ -110,6 +177,7 @@ class Media {
     font,
     cardWidth = 1200,
     cardHeight = 350,
+    onClick,
   }) {
     this.extra = 0;
     this.geometry = geometry;
@@ -128,6 +196,7 @@ class Media {
     this.font = font;
     this.cardWidth = cardWidth;
     this.cardHeight = cardHeight;
+    this.onClick = onClick;
     this.createShader();
     this.createMesh();
     this.createTitle();
@@ -146,11 +215,14 @@ class Media {
         uniform mat4 projectionMatrix;
         uniform float uTime;
         uniform float uSpeed;
+        uniform float uHover;
         varying vec2 vUv;
         void main() {
           vUv = uv;
           vec3 p = position;
           p.z = (sin(p.x * 4.0 + uTime) * 1.5 + cos(p.y * 2.0 + uTime) * 1.5) * (0.1 + uSpeed * 0.5);
+          // Add hover effect
+          p.z += uHover * 0.1;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
         }
       `,
@@ -160,6 +232,7 @@ class Media {
         uniform vec2 uPlaneSizes;
         uniform sampler2D tMap;
         uniform float uBorderRadius;
+        uniform float uHover;
         varying vec2 vUv;
         
         float roundedBoxSDF(vec2 p, vec2 b, float r) {
@@ -181,18 +254,16 @@ class Media {
             vUv.y * ratio.y + (1.0 - ratio.y) * 0.5
           );
           vec4 color = texture2D(tMap, uv);
-          // Remove vignette/shadow effect
-          // float border = 0.015;
-          // float shadow = smoothstep(0.5 - border, 0.5 - border + 0.01, length(vUv - 0.5));
-          // color.rgb = mix(color.rgb, vec3(0.15,0.15,0.15), shadow * 0.25);
           float d = roundedBoxSDF(vUv - 0.5, vec2(0.5 - uBorderRadius), uBorderRadius);
           if(d > 0.0) {
             discard;
           }
-          // White border
+          // White border with hover effect
           if(abs(vUv.x-0.5) > 0.5-0.015 || abs(vUv.y-0.5) > 0.5-0.015) {
-            color = vec4(1.0,1.0,1.0,1.0);
+            color = vec4(1.0 + uHover * 0.2, 1.0 + uHover * 0.2, 1.0 + uHover * 0.2, 1.0);
           }
+          // Add hover glow
+          color.rgb += uHover * 0.1;
           gl_FragColor = vec4(color.rgb, 1.0);
         }
       `,
@@ -203,6 +274,7 @@ class Media {
         uSpeed: { value: 0 },
         uTime: { value: 100 * Math.random() },
         uBorderRadius: { value: this.borderRadius },
+        uHover: { value: 0 },
       },
       transparent: true,
     });
@@ -292,6 +364,25 @@ class Media {
     this.widthTotal = this.width * this.length;
     this.x = this.width * this.index;
   }
+  setHover(hover) {
+    this.program.uniforms.uHover.value = hover ? 1 : 0;
+  }
+  checkClick(mouseX, mouseY) {
+    const planeOffset = this.plane.scale.x / 2;
+    const x = this.plane.position.x;
+    
+    // Check if mouse is within the card bounds
+    const cardLeft = x - planeOffset;
+    const cardRight = x + planeOffset;
+    const cardTop = this.plane.position.y + this.plane.scale.y / 2;
+    const cardBottom = this.plane.position.y - this.plane.scale.y / 2;
+    
+    if (mouseX >= cardLeft && mouseX <= cardRight && 
+        mouseY >= cardBottom && mouseY <= cardTop) {
+      return true;
+    }
+    return false;
+  }
 }
 
 class App {
@@ -307,6 +398,7 @@ class App {
       scrollEase = 0.05,
       cardWidth = 1200,
       cardHeight = 350,
+      onCertificateClick,
     } = {}
   ) {
     document.documentElement.classList.remove("no-js");
@@ -314,6 +406,7 @@ class App {
     this.scrollSpeed = scrollSpeed;
     this.scroll = { ease: scrollEase, current: 0, target: 0, last: 0 };
     this.onCheckDebounce = debounce(this.onCheck, 200);
+    this.onCertificateClick = onCertificateClick;
     this.createRenderer();
     this.createCamera();
     this.createScene();
@@ -378,6 +471,7 @@ class App {
         font,
         cardWidth,
         cardHeight,
+        onClick: () => this.onCertificateClick?.(data),
       });
     });
   }
@@ -441,6 +535,8 @@ class App {
     this.boundOnTouchDown = this.onTouchDown.bind(this);
     this.boundOnTouchMove = this.onTouchMove.bind(this);
     this.boundOnTouchUp = this.onTouchUp.bind(this);
+    this.boundOnClick = this.onClick.bind(this);
+    this.boundOnMouseMove = this.onMouseMove.bind(this);
     window.addEventListener("resize", this.boundOnResize);
     window.addEventListener("mousewheel", this.boundOnWheel);
     window.addEventListener("wheel", this.boundOnWheel);
@@ -450,6 +546,42 @@ class App {
     window.addEventListener("touchstart", this.boundOnTouchDown);
     window.addEventListener("touchmove", this.boundOnTouchMove);
     window.addEventListener("touchend", this.boundOnTouchUp);
+    this.container.addEventListener("click", this.boundOnClick);
+    this.container.addEventListener("mousemove", this.boundOnMouseMove);
+  }
+  onClick(e) {
+    const rect = this.container.getBoundingClientRect();
+    const mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const mouseY = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+    
+    // Convert to world coordinates
+    const worldX = mouseX * this.viewport.width / 2;
+    const worldY = mouseY * this.viewport.height / 2;
+    
+    // Check which certificate was clicked
+    for (let i = 0; i < this.medias.length; i++) {
+      if (this.medias[i].checkClick(worldX, worldY)) {
+        const originalIndex = i % (this.mediasImages.length / 2);
+        const certificateData = this.mediasImages[originalIndex];
+        this.onCertificateClick?.(certificateData);
+        break;
+      }
+    }
+  }
+  onMouseMove(e) {
+    const rect = this.container.getBoundingClientRect();
+    const mouseX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const mouseY = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+    
+    // Convert to world coordinates
+    const worldX = mouseX * this.viewport.width / 2;
+    const worldY = mouseY * this.viewport.height / 2;
+    
+    // Update hover states
+    this.medias.forEach(media => {
+      const isHovered = media.checkClick(worldX, worldY);
+      media.setHover(isHovered);
+    });
   }
   destroy() {
     window.cancelAnimationFrame(this.raf);
@@ -462,6 +594,8 @@ class App {
     window.removeEventListener("touchstart", this.boundOnTouchDown);
     window.removeEventListener("touchmove", this.boundOnTouchMove);
     window.removeEventListener("touchend", this.boundOnTouchUp);
+    this.container.removeEventListener("click", this.boundOnClick);
+    this.container.removeEventListener("mousemove", this.boundOnMouseMove);
     if (this.renderer && this.renderer.gl && this.renderer.gl.canvas.parentNode) {
       this.renderer.gl.canvas.parentNode.removeChild(this.renderer.gl.canvas);
     }
@@ -478,13 +612,25 @@ export default function CircularGallery({
   scrollEase = 0.05,
   cardWidth = 1200,
   cardHeight = 350,
+  onCertificateClick,
 }) {
   const containerRef = useRef(null);
   useEffect(() => {
-    const app = new App(containerRef.current, { items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, cardWidth, cardHeight });
+    const app = new App(containerRef.current, { 
+      items, 
+      bend, 
+      textColor, 
+      borderRadius, 
+      font, 
+      scrollSpeed, 
+      scrollEase, 
+      cardWidth, 
+      cardHeight,
+      onCertificateClick,
+    });
     return () => {
       app.destroy();
     };
-  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, cardWidth, cardHeight]);
+  }, [items, bend, textColor, borderRadius, font, scrollSpeed, scrollEase, cardWidth, cardHeight, onCertificateClick]);
   return <div className="circular-gallery" ref={containerRef} />;
 } 
